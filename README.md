@@ -23,11 +23,9 @@ Say is invite-only. There are no ads and no public feed.
 
 ## Get Say
 
-**iPhone.** Say is in beta through TestFlight. Install Apple's TestFlight app
-first, then open the invitation:
-
-> Beta invitation: coming in the next section of this README once the public
-> TestFlight link is live.
+**iPhone.** Say is in beta through TestFlight. The public invitation is waiting
+on Apple's review of the first external build; this section gets the link the
+day it clears. Until then, ask Dean and you will be added directly.
 
 **Mac.** Download the latest build and drag Say to your Applications folder:
 
