@@ -1,0 +1,68 @@
+#!/bin/bash
+# say-hey-mcp — Claude Code plugin wrapper.
+#
+# Runs Say hey's MCP connector in proxy mode: the connector talks to the running
+# app on 127.0.0.1 and never opens the message store itself. The per-user access
+# token is read from the app's own preferences, so there is nothing to paste.
+#
+# Which connector binary runs, in order:
+#   1. $SAYHEY_MCP_BIN                          an explicit override
+#   2. <plugin>/bin/say-hey-mcp-bin             a connector shipped with the plugin
+#   3. Say hey.app/Contents/MacOS/say-hey-mcp   only if that helper is NOT sandboxed
+# The App Store build's helper is sandboxed and cannot be launched from outside
+# the app, so on that build (2) is required. The wrapper says so rather than crash.
+set -u
+
+BUNDLE_ID="dev.sparklabs.recall"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+sandboxed() {  # exit 0 if the binary carries the app-sandbox entitlement
+  codesign -d --entitlements :- "$1" 2>/dev/null | grep -q "com.apple.security.app-sandbox"
+}
+
+# 1–2. An explicit or shipped connector wins.
+BIN="${SAYHEY_MCP_BIN:-}"
+[ -z "$BIN" ] && [ -x "$HERE/say-hey-mcp-bin" ] && BIN="$HERE/say-hey-mcp-bin"
+
+# 3. Otherwise the helper inside the installed app, if it's usable.
+if [ -z "$BIN" ]; then
+  APP=""
+  if command -v mdfind >/dev/null 2>&1; then
+    APP="$(mdfind "kMDItemCFBundleIdentifier == '$BUNDLE_ID'" 2>/dev/null | head -n 1)"
+  fi
+  [ -z "$APP" ] && [ -d "/Applications/Say hey.app" ] && APP="/Applications/Say hey.app"
+  [ -z "$APP" ] && [ -d "$HOME/Applications/Say hey.app" ] && APP="$HOME/Applications/Say hey.app"
+  if [ -z "$APP" ]; then
+    echo "say-hey: Say hey isn't installed. Install it, open it once, then turn on Settings → Connections." >&2
+    exit 1
+  fi
+  CAND="$APP/Contents/MacOS/say-hey-mcp"
+  [ -x "$CAND" ] || CAND="$APP/Contents/Resources/say-hey-mcp"
+  if [ ! -x "$CAND" ]; then
+    echo "say-hey: this build of Say hey has no MCP connector ($APP)." >&2
+    exit 1
+  fi
+  if sandboxed "$CAND"; then
+    echo "say-hey: the connector inside this App Store build is sandboxed and can't run from here." >&2
+    echo "say-hey: this plugin needs the standalone connector at bin/say-hey-mcp-bin (or SAYHEY_MCP_BIN)." >&2
+    exit 1
+  fi
+  BIN="$CAND"
+fi
+
+# Token: honour an explicit one; else read the app's own preferences — the
+# sandboxed container first, then the plist a non-sandboxed build writes.
+# If neither has it yet, still run: the app replies "not authorized" with the fix.
+if [ -z "${SAYHEY_MCP_TOKEN:-}" ]; then
+  for PLIST in "$HOME/Library/Containers/$BUNDLE_ID/Data/Library/Preferences/$BUNDLE_ID" \
+               "$HOME/Library/Preferences/$BUNDLE_ID"; do
+    TOKEN="$(defaults read "$PLIST" mcpAccessToken 2>/dev/null || true)"
+    if [ -n "$TOKEN" ]; then
+      export SAYHEY_MCP_TOKEN="$TOKEN"
+      break
+    fi
+  done
+fi
+
+export SAYHEY_MCP_FORCE_PROXY=1
+exec "$BIN" "$@"

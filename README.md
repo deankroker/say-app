@@ -71,3 +71,18 @@ Say is built on [block/buzz](https://github.com/block/buzz), which is licensed
 under Apache 2.0. Buzz provides the authenticated event transport, membership
 enforcement, media, sync and agent runtime beneath everything above. Say is an
 independent product and is not endorsed by Block.
+
+## Say hey
+
+Say hey is the other product: a native macOS app that reads your iMessage history on your Mac and
+surfaces what you promised, what you dropped, and where things stand — with the real message as
+evidence. It ships on the [Mac App Store](https://apps.apple.com/us/app/say-hey-message-memory/id6767099766).
+
+Its Claude Code plugin lives in this repo at [`plugins/say-hey`](plugins/say-hey):
+
+```
+/plugin marketplace add deankroker/say-app
+/plugin install say-hey@say
+```
+
+Then ask Claude Code: *"What did I promise recently?"*

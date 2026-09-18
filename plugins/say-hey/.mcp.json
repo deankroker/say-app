@@ -1,0 +1,7 @@
+{
+  "say-hey": {
+    "command": "${CLAUDE_PLUGIN_ROOT}/bin/say-hey-mcp",
+    "args": [],
+    "env": { "SAYHEY_MCP_FORCE_PROXY": "1" }
+  }
+}

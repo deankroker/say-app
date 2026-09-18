@@ -1,0 +1,21 @@
+{
+  "name": "say-hey",
+  "displayName": "Say hey",
+  "version": "0.1.0",
+  "description": "Ask your own iMessage history from Claude Code \u2014 what you promised, who you owe, where things stand \u2014 with every answer cited to the real message. Say hey answers from your Mac; Claude receives only the retrieved results.",
+  "author": {
+    "name": "Spark LLC",
+    "url": "https://apps.apple.com/us/app/say-hey-message-memory/id6767099766"
+  },
+  "homepage": "https://say.kroker.me",
+  "keywords": [
+    "imessage",
+    "messages",
+    "follow-ups",
+    "relationships",
+    "memory",
+    "mcp",
+    "macos"
+  ],
+  "mcpServers": "./.mcp.json"
+}

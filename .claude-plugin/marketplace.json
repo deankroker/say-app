@@ -1,0 +1,13 @@
+{
+  "name": "say",
+  "description": "Say and Say hey for Claude Code. Say hey: your iMessage history, answered with citations, from your own Mac.",
+  "owner": { "name": "Dean Kroker", "url": "https://say.kroker.me" },
+  "plugins": [
+    {
+      "name": "say-hey",
+      "source": "./plugins/say-hey",
+      "description": "Ask your own iMessage history from Claude Code. Requires the Say hey macOS app.",
+      "version": "0.1.0"
+    }
+  ]
+}
